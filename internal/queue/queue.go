@@ -1,6 +1,6 @@
 package queue
 
-import "github.com/amitpanthi/joblin/job"
+import "github.com/amitpanthi/joblin/internal/job"
 
 type JobQueue struct {
 	Jobs chan job.Job

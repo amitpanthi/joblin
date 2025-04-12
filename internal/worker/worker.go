@@ -1,10 +1,11 @@
 package worker
 
 import (
+	"context"
 	"fmt"
-	"sync"
+	"time"
 
-	"github.com/amitpanthi/joblin/job"
+	"github.com/amitpanthi/joblin/internal/job"
 )
 
 type Worker struct {
@@ -19,14 +20,18 @@ func SpawnWorker(id int, jobChan chan job.Job) *Worker {
 	}
 }
 
-func (w *Worker) Start(wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	for job := range w.JobChan {
-		handle(job)
+func (w *Worker) Start(ctx context.Context) {
+	for {
+		select {
+		case job := <-w.JobChan:
+			handle(job)
+		case <-ctx.Done():
+			return
+		}
 	}
 }
 
 func handle(job job.Job) {
+	time.Sleep(1 * time.Second)
 	fmt.Printf("Job %d handled, job type - %s.\n", job.ID, job.Type)
 }
